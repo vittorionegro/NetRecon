@@ -1,4 +1,5 @@
 import socket
+import sys
 
 def check_port(host, port):
     sock = socket.socket()
@@ -7,11 +8,16 @@ def check_port(host, port):
     res = sock.connect_ex((host, port))
 
     if(res == 0):
-        print("[+] ", port,"/tcp responded")
+        print(f"[+] {port}/tcp responded")
     else:
-        print("[-] ", port,"/tcp didnt respond")
+        print(f"[-] {port}/tcp didn't respond")
     sock.close()
     
 
 
-check_port("127.0.0.1", 8000)
+if len(sys.argv) < 2:
+    print("Usage: python netrecon.py <target>")
+    sys.exit(1)
+target = sys.argv[1]
+
+check_port(target, 8000)
