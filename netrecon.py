@@ -1,5 +1,6 @@
 import socket
 import sys
+import argparse
 
 def check_port(host, port):
     sock = socket.socket()
@@ -13,19 +14,13 @@ def check_port(host, port):
         print(f"[-] {port}/tcp didn't respond")
     sock.close()
     
+parser = argparse.ArgumentParser(description="NetRecon: Network recon tool")
+parser.add_argument("target", help="IP address to scan")
+parser.add_argument("--ports", default="8000", help="comma-separated ports")
 
+args = parser.parse_args()
 
-if len(sys.argv) < 2:
-    print("Usage: python netrecon.py <target>")
-    sys.exit(1)
-target = sys.argv[1]
-
-if len(sys.argv) > 3 and sys.argv[2] == "--ports":
-    ports = sys.argv[3]
-else:
-    ports = "8000"
-
-nports = ports.split(",")
+nports = args.ports.split(",")
 
 for port in nports:
-    check_port(target, int(port))
+    check_port(args.target, int(port))
