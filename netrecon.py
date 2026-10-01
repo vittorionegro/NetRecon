@@ -1,6 +1,13 @@
 import socket
 import sys
 import argparse
+from dataclasses import dataclass
+
+@dataclass
+class Service:
+    port: int
+    protocol: str
+    status: str
 
 def check_port(host, port):
     sock = socket.socket()
@@ -9,18 +16,21 @@ def check_port(host, port):
     res = sock.connect_ex((host, port))
 
     if(res == 0):
-        print(f"[+] {port}/tcp responded")
-    else:
-        print(f"[-] {port}/tcp didn't respond")
-    sock.close()
+        sock.close()
+        return(Service(port, protocol="tcp", status="open"))
     
-parser = argparse.ArgumentParser(description="NetRecon: Network recon tool")
-parser.add_argument("target", help="IP address to scan")
-parser.add_argument("--ports", default="8000", help="comma-separated ports")
+    else:
+        sock.close()
+        return(Service(port, protocol="tcp", status="closed"))
+    
+parser = argparse.ArgumentParser(description="NetRecon: Network recon tool")  # parser
+parser.add_argument("target", help="IP address to scan")  # args.target
+parser.add_argument("--ports", default="8000", help="comma-separated ports")  # args.ports
 
-args = parser.parse_args()
+args = parser.parse_args()  # args
+nports = args.ports.split(",")  # nports
 
-nports = args.ports.split(",")
+for p in nports:
+    print(check_port(args.target, int(p)))
 
-for port in nports:
-    check_port(args.target, int(port))
+
