@@ -51,29 +51,33 @@ def outputCsv(host, path):
         for s in host.services:
             writer.writerow([host.ip, s.port, s.protocol, s.status])
 
-
-    
-parser = argparse.ArgumentParser(description="NetRecon: Network recon tool")  # parser
-parser.add_argument("target", help="IP address to scan")  # args.target
-parser.add_argument("--ports", default="8000", help="comma-separated ports")  # args.ports
-parser.add_argument("--output", help="JSON or CSV file to save results to") # args.output
-
-args = parser.parse_args()
-ports = args.ports.split(",")
-
-host = Host(args.target)
-for p in ports:
-    host.services.append(checkPort(args.target, int(p)))
-
-printHost(host)
-
-if args.output:
-    if args.output.endswith(".csv"):
-        outputCsv(host, args.output)
-        print(f"[+] Results saved to {args.output}")
-    elif args.output.endswith(".json"):
-        outputJson(host, args.output)
-        print(f"[+] Results saved to {args.output}")
+def saveOutput(host, path):
+    if path.endswith(".csv"):
+        outputCsv(host, path)
+    elif path.endswith(".json"):
+        outputJson(host, path)
     else:
-        print(f"[!] Unknown output type '{args.output}', use .json or .csv")
+        print(f"[!] Unknown output type '{path}', use .json or .csv")
         sys.exit(1)
+    print(f"[+] Results saved to {path}")
+
+def scanHost(target, ports):
+    host = Host(target)
+    for p in ports:
+        host.services.append(checkPort(target, int(p)))
+    return host
+
+def main():
+    parser = argparse.ArgumentParser(description="NetRecon: Network recon tool")
+    parser.add_argument("target", help="IP address to scan")
+    parser.add_argument("--ports", default="8000", help="comma-separated ports")
+    parser.add_argument("--output", help="JSON or CSV file to save results to")
+    args = parser.parse_args()
+
+    host = scanHost(args.target, args.ports.split(","))
+    printHost(host)
+    if args.output:
+        saveOutput(host, args.output)
+
+if __name__ == "__main__":
+    main()
