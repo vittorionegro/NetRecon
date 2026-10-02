@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 roadmap.txt
+balls.csv
+balls.json
+scan.json
+scan.csv
